@@ -1,0 +1,15 @@
+name: Check Draft
+author: Jhones Bomfim
+
+default:
+  run:
+    shell: bash
+
+env:
+  CI_MERGE_REUQEST)TITLE: ${{ github.event.pull_request.title || '' }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check for interrupt signals
+      run: case "$CI_MERGE_REQUEST_TITLE" in Draft*) echo "Remove 'Draft' to enabled";exit 1;;esac

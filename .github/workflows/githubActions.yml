@@ -11,3 +11,9 @@ defaults:
     shell: bash
 
 jobs:
+  essentials:
+    name: 🛠️ essentials
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./template/check_draft
