@@ -42,4 +42,4 @@ jobs:
     needs: [lint, docs]
     steps:
       - uses: actions/checkout@v4
-      - uses: ./template/security_scan
+      - uses: ./templates/security_scan
