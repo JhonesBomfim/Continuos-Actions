@@ -18,6 +18,6 @@ runs:
 
     - name: Run Security Scan
       run: |
-        uv tool install pip -audit
+        uv tool install pip-audit
         uv tool run pip-audit || echo "WARNING: Vulnerabilities found, please review"
       shell: bash
