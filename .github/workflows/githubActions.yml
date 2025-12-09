@@ -18,3 +18,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./templates/check_draft
       - uses: ./templates/check_conflicts
+      - uses: ./templates/check_merge
