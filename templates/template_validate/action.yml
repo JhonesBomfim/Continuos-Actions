@@ -1,0 +1,58 @@
+name: Template validate
+author: Jhones Bomfim
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate project structure
+      shell: bash
+      run: |
+        required_file=(
+            "pyproject.toml"
+            "README.md"
+            "LICENSE"
+            ".gitignore"
+            ".pre-commit-config.yaml"
+        )
+
+        missing=()
+
+        for file in "${required_file[@]}"; do
+            if [ ! -f "$file" ]; then
+                missing+=("$file")
+            fi
+        done
+
+        if [ ${#missing[@]} -gt 0 ]; then
+            echo "ERROR: Missing required files:"
+            printf '  • %s\n' "${missing[@]}"
+            exit 1
+        fi
+        echo "✅ All required files present"
+
+
+        echo "Validating pyproject.toml ..."
+        if ! grep -q "requires-python" pyproject.toml; then
+            echo "ERROR: pyproject.toml missing 'requires-python'"
+            exit 1
+        fi
+
+        if ! grep -q '\[project\]' pyproject.toml; then
+            echo "ERROR: pyproject.toml missing '[project]' section"
+            exit 1
+        fi
+
+        echo "✅ pyproject.toml is valid"
+
+        echo "⚙️ Checking GitHub Actions structure..."
+
+        if [ ! -d ".github/workflows" ]; then
+            echo "ERROR: .github/workflows directory not found"
+            exit 1
+        fi
+
+        if [ ! -d ".github/actions" ]; then
+            echo "WARNING: .github/actions directory not found (recommended for reusable actions)"
+        fi
+
+        echo "✅ GitHub Actions structure is valid"

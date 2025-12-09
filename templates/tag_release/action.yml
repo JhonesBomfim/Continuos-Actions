@@ -1,0 +1,86 @@
+name: Tag Release Generate
+author: Jhones Bomfim
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Generating Tag
+      shell: bash
+      run: |
+        if [ ! -f ".version" ]; then
+            echo "ERROR: .version file not found"
+            exit 1
+        fi
+
+        version=$(cat .version | tr -d '[:space:]')
+        echo "version=v$version" >> $GITHUB_OUTPUT
+        echo "Version from .version file: v$version"
+
+        version="${{ steps.version.outputs.version }}"
+
+        if git rev-parse "$version" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Warning: Tag $version already exists, skipping"
+        else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Tag $version does not exist, will create"
+        fi
+
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+        version="${{ steps.version.outputs.version }}"
+
+        git tag -a "$version" -m "Release $version"
+        git push origin "$version"
+        echo "Tag $version created and pushed"
+
+        version="${{ steps.version.outputs.version }}"
+
+        echo "Creating GitHub Release for $version"
+
+        if ! command -v gh &> /dev/null; then
+            echo "ERROR: GitHub CLI (gh) not found!"
+            exit 1
+        fi
+
+        if git describe --tags --abbrev=0 HEAD^ >/dev/null 2>&1; then
+            previous_tag=$(git describe --tags --abbrev=0 HEAD^)
+        else
+            previous_tag=""
+        fi
+
+        if [ -n "$previous_tag" ]; then
+            commits=$(git log $previous_tag..HEAD --pretty=format:"%s (%h) by %an" --no-merges)
+        else
+            commits=$(git log --pretty=format:"%s (%h) by %an" --no-merges --max-count=20)
+        fi
+
+        if [ -n "$commits" ]; then
+            echo "$commits" | while read -r line; do
+            echo "- $line" >> /tmp/release-notes.md
+            done
+        else
+            echo "- First release or no new commits since last tag" >> /tmp/release-notes.md
+        fi
+
+        if [ -n "$previous_tag" ]; then
+            contributors=$(git log $previous_tag..HEAD --pretty=format:"%an" --no-merges | sort -u)
+        else
+            contributors=$(git log --pretty=format:"%an" --no-merges --max-count=20 | sort -u)
+        fi
+
+        echo "$contributors" | while read -r contributor; do
+            echo "- $contributor" >> /tmp/release-notes.md
+        done
+
+        if [ -n "$previous_tag" ]; then
+            echo "" >> /tmp/release-notes.md
+            echo "---" >> /tmp/release-notes.md
+            echo "" >> /tmp/release-notes.md
+            echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${previous_tag}...${version}" >> /tmp/release-notes.md
+        fi
+
+        cat /tmp/release-notes.md
+
+        gh release create "$version" --title "Release $version" --notes-file /tmp/release-notes.md --verify-tag
