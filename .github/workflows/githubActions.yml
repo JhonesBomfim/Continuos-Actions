@@ -35,3 +35,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./templates/check_docs
+
+  security_scan:
+    name: 🛡️ Secutiry Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./template/security_scan
