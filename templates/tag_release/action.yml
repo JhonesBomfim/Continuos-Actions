@@ -16,10 +16,6 @@ runs:
         version="v$version"
         echo "version=$version" >> $GITHUB_OUTPUT
         echo "Version from .version file: $version"
-        echo "version=v$version" >> $GITHUB_OUTPUT
-        echo "Version from .version file: v$version"
-
-        version="${{ steps.version.outputs.version }}"
 
         if git rev-parse "$version" >/dev/null 2>&1; then
             echo "exists=true" >> $GITHUB_OUTPUT
@@ -32,13 +28,9 @@ runs:
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
 
-        version="${{ steps.version.outputs.version }}"
-
         git tag -a "$version" -m "Release $version"
         git push origin "$version"
         echo "Tag $version created and pushed"
-
-        version="${{ steps.version.outputs.version }}"
 
         echo "Creating GitHub Release for $version"
 
