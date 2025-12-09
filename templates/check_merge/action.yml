@@ -1,0 +1,31 @@
+name: Checking merge
+author: Jhones Bomfim
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check for merge conflicts
+      shell: bash
+      run: |
+        set -euo pipefail
+        if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+            echo "Not inside a Git Repository"
+            exit 1
+        fi
+
+        echo "Checking for git conflict markers in tracked files..."
+
+        conflicts_files=$(git ls-files -z | \
+            xargs -0 grep -lE '^(<<<<<<< .+|======={7}|>>>>>>> .+)$' 2>/dev/null | sort -u || true
+        )
+
+        if [ -z "$conflicts_files" ]; then
+            echo "No conflict found"
+            exit 0
+        else
+            echo "ALERT! Conflicts markers detected"
+            echo "$conflicts_files" | sed 's/^/   • /'
+            echo
+            echo "ERROR! Please resolve these conflicts before pushing"
+            exit 1
+        fi

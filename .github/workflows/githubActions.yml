@@ -11,3 +11,11 @@ defaults:
     shell: bash
 
 jobs:
+  essentials:
+    name: 🛠️ essentials
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./templates/check_draft
+      - uses: ./templates/check_conflicts
+      - uses: ./templates/check_merge
