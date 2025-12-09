@@ -6,6 +6,8 @@ runs:
   steps:
     - name: Generating Tag
       shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         if [ ! -f ".version" ]; then
             echo "ERROR: .version file not found"
