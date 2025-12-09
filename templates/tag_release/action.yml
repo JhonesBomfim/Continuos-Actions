@@ -13,6 +13,9 @@ runs:
         fi
 
         version=$(cat .version | tr -d '[:space:]')
+        version="v$version"
+        echo "version=$version" >> $GITHUB_OUTPUT
+        echo "Version from .version file: $version"
         echo "version=v$version" >> $GITHUB_OUTPUT
         echo "Version from .version file: v$version"
 
