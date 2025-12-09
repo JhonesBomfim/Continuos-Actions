@@ -1,0 +1,23 @@
+name: Security Scan
+author: Jhones Bomfim
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install UV
+      uses: astral-sh/setup-uv@v4
+
+    - name: Sync Dependencies
+      run: uv sync
+      shell: bash
+
+    - name: Run Security Scan
+      run: |
+        uv tool install pip-audit
+        uv tool run pip-audit || echo "WARNING: Vulnerabilities found, please review"
+      shell: bash
