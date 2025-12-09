@@ -43,3 +43,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./templates/security_scan
+
+  template_validate:
+    name: 👍 Template Validate
+    runs-on: ubuntu-latest
+    needs: [security_scan]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./templates/template_validate
