@@ -19,3 +19,11 @@ jobs:
       - uses: ./templates/check_draft
       - uses: ./templates/check_conflicts
       - uses: ./templates/check_merge
+
+  lint:
+    name: 🧐 Linting
+    runs-on: ubuntu-latest
+    needs: essentials
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./templates/lint
