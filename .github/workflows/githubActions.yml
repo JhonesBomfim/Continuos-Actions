@@ -39,6 +39,7 @@ jobs:
   security_scan:
     name: 🛡️ Secutiry Scan
     runs-on: ubuntu-latest
+    needs: [lint, docs]
     steps:
       - uses: actions/checkout@v4
       - uses: ./template/security_scan
