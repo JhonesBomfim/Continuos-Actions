@@ -3,9 +3,6 @@ author: Jhones Bomfim
 
 runs:
   using: 'composite'
-  shell: bash
-  env:
-
   steps:
     run: |
       line_cout=$(wc -l < README.md)
@@ -29,3 +26,4 @@ runs:
           echo "LICENSE not found"
           exit 1
       fi
+    shell: bash
